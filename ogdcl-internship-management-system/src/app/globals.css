@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+@theme {
+  /* OGDCL brand teal palette */
+  --color-brand-50: #ecfdfa;
+  --color-brand-100: #d1faf3;
+  --color-brand-200: #a7f3e9;
+  --color-brand-300: #6ee7db;
+  --color-brand-400: #34d3c6;
+  --color-brand-500: #16b9b0;
+  --color-brand-600: #0e968f;
+  --color-brand-700: #107873;
+  --color-brand-800: #125e5c;
+  --color-brand-900: #124e4c;
+  --color-brand-950: #042f2e;
+
+  /* "the energy" ocean-blue palette */
+  --color-energy-50: #ecf4fb;
+  --color-energy-100: #d4e7f5;
+  --color-energy-200: #a9cfeb;
+  --color-energy-300: #74b1dd;
+  --color-energy-400: #3f90cc;
+  --color-energy-500: #2b7cb8;
+  --color-energy-600: #21639c;
+  --color-energy-700: #1e507f;
+  --color-energy-800: #1d4468;
+  --color-energy-900: #1c3a57;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04),
+    0 8px 24px -12px rgba(16, 24, 40, 0.12);
+  --shadow-pop: 0 10px 40px -12px rgba(16, 24, 40, 0.24);
+}
+
+:root {
+  --sidebar-w: 264px;
+}
+
+* {
+  border-color: rgb(224 230 237);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #f4f7fa;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Slim, brand-colored scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(196 209 216) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgb(196 209 216);
+  border-radius: 9999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(168 184 191);
+}
+
+/* Subtle fade-in used across cards */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fadeUp 0.35s ease both;
+}
+
+@keyframes pulseSoft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+.animate-pulse-soft {
+  animation: pulseSoft 2s ease-in-out infinite;
+}

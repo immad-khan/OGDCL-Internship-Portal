@@ -12,7 +12,7 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-6">
       <Link
-        href="/"
+        href="/supervisor"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition hover:text-brand-700"
       >
         <IconChevronLeft className="h-4 w-4" /> Back to dashboard

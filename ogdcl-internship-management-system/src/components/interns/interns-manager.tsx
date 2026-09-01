@@ -288,7 +288,7 @@ export function InternsManager({
                   <Avatar name={i.name} size="lg" />
                   <div className="min-w-0 flex-1">
                     <Link
-                      href={`/interns/${i.id}`}
+                      href={`/supervisor/interns/${i.id}`}
                       className="flex items-center gap-1 text-base font-semibold text-slate-800 hover:text-brand-700"
                     >
                       <span className="truncate">{i.name}</span>

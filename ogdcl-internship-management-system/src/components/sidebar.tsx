@@ -36,18 +36,18 @@ export function Sidebar({
   const pathname = usePathname();
 
   const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
+    href === "/supervisor" ? pathname === "/supervisor" : pathname.startsWith(href);
 
   const overview: NavItem[] = [
-    { href: "/", label: "Dashboard", icon: IconDashboard },
-    { href: "/interns", label: "Interns", icon: IconUsers },
-    { href: "/tasks", label: "Tasks", icon: IconTasks },
+    { href: "/supervisor", label: "Dashboard", icon: IconDashboard },
+    { href: "/supervisor/interns", label: "Interns", icon: IconUsers },
+    { href: "/supervisor/tasks", label: "Tasks", icon: IconTasks },
   ];
   const management: NavItem[] = [
-    { href: "/messages", label: "Messages", icon: IconMessage, badge: unread },
-    { href: "/reports", label: "Reports", icon: IconFile },
+    { href: "/supervisor/messages", label: "Messages", icon: IconMessage, badge: unread },
+    { href: "/supervisor/reports", label: "Reports", icon: IconFile },
   ];
-  const account: NavItem[] = [{ href: "/settings", label: "Settings", icon: IconSettings }];
+  const account: NavItem[] = [{ href: "/supervisor/settings", label: "Settings", icon: IconSettings }];
 
   const renderItem = (item: NavItem) => {
     const active = isActive(item.href);

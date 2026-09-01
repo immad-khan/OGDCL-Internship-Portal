@@ -119,13 +119,13 @@ export default async function DashboardPage() {
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href="/tasks"
+            href="/supervisor/tasks"
             className="inline-flex items-center gap-2 rounded-xl bg-white/15 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/25"
           >
             <IconPlus className="h-4 w-4" /> New Task
           </Link>
           <Link
-            href="/interns?new=1"
+            href="/supervisor/interns?new=1"
             className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50"
           >
             <IconPlus className="h-4 w-4" /> Add Intern
@@ -236,7 +236,7 @@ export default async function DashboardPage() {
         <div className="rounded-2xl border border-slate-200 bg-white shadow-[var(--shadow-card)] lg:col-span-2">
           <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <h3 className="text-base font-semibold text-slate-800">Recent Messages</h3>
-            <Link href="/messages" className="text-sm font-semibold text-brand-600 hover:text-brand-700">
+            <Link href="/supervisor/messages" className="text-sm font-semibold text-brand-600 hover:text-brand-700">
               View all
             </Link>
           </div>
@@ -244,7 +244,7 @@ export default async function DashboardPage() {
             {data.recentMessages.map((m) => (
               <Link
                 key={m.id}
-                href={`/messages?id=${m.internId}`}
+                href={`/supervisor/messages?id=${m.internId}`}
                 className="flex items-center gap-3 px-5 py-3.5 transition hover:bg-slate-50"
               >
                 <Avatar name={m.internName ?? "?"} size="md" />
@@ -269,7 +269,7 @@ export default async function DashboardPage() {
         <div className="rounded-2xl border border-slate-200 bg-white shadow-[var(--shadow-card)]">
           <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <h3 className="text-base font-semibold text-slate-800">Upcoming Tasks</h3>
-            <Link href="/tasks" className="text-sm font-semibold text-brand-600 hover:text-brand-700">
+            <Link href="/supervisor/tasks" className="text-sm font-semibold text-brand-600 hover:text-brand-700">
               View all
             </Link>
           </div>
@@ -335,7 +335,7 @@ export default async function DashboardPage() {
         <div className="rounded-2xl border border-slate-200 bg-white shadow-[var(--shadow-card)] lg:col-span-2">
           <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <h3 className="text-base font-semibold text-slate-800">Recent Interns</h3>
-            <Link href="/interns" className="text-sm font-semibold text-brand-600 hover:text-brand-700">
+            <Link href="/supervisor/interns" className="text-sm font-semibold text-brand-600 hover:text-brand-700">
               View all
             </Link>
           </div>
@@ -343,7 +343,7 @@ export default async function DashboardPage() {
             {data.recentInterns.map((i) => (
               <Link
                 key={i.id}
-                href={`/interns/${i.id}`}
+                href={`/supervisor/interns/${i.id}`}
                 className="flex items-center gap-3 rounded-xl border border-slate-100 p-3 transition hover:border-brand-200 hover:bg-brand-50/40"
               >
                 <Avatar name={i.name} size="md" />

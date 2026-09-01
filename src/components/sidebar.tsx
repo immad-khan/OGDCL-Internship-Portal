@@ -118,12 +118,14 @@ export function Sidebar({
             <p className="truncate text-sm font-semibold text-slate-800">{supervisor.name}</p>
             <p className="truncate text-xs text-slate-500">{supervisor.designation}</p>
           </div>
-          <button
+          <Link
+            href="/"
+            onClick={onClose}
             className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white hover:text-slate-600"
             aria-label="Sign out"
           >
             <IconLogout className="h-4.5 w-4.5" />
-          </button>
+          </Link>
         </div>
       </div>
     </aside>

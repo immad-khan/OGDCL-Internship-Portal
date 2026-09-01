@@ -579,7 +579,7 @@ export default function App() {
             </button>
             {profileOpen && <div className="absolute right-0 top-12 z-40 w-[190px] overflow-hidden rounded-xl border border-[#e0e8f1] bg-white p-1.5 shadow-xl animate-pop">
               <button className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-semibold text-[#526f8d] hover:bg-[#f5f8fb]"><Settings className="h-4 w-4" /> Account settings</button>
-              <button className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-semibold text-[#c75d65] hover:bg-[#fff5f5]"><LogOut className="h-4 w-4" /> Sign out</button>
+              <button onClick={() => window.location.assign("/")} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-semibold text-[#c75d65] hover:bg-[#fff5f5]"><LogOut className="h-4 w-4" /> Sign out</button>
             </div>}
           </div>
         </header>

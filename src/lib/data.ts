@@ -1,4 +1,4 @@
-import { db } from "@/db";
+import { db, hasDatabase } from "@/db";
 import {
   interns,
   supervisors,
@@ -8,14 +8,17 @@ import {
 } from "@/db/schema";
 import { eq, desc, asc, count, and, gte, lte, sql } from "drizzle-orm";
 import { ensureSeeded } from "@/lib/seed";
+import { mockInterns, mockMessages, mockReports, mockSupervisor, mockTasks } from "@/lib/mock-data";
 
 export async function getSupervisor() {
+  if (!hasDatabase) return mockSupervisor;
   await ensureSeeded();
   const rows = await db.select().from(supervisors).limit(1);
   return rows[0] ?? null;
 }
 
 export async function getInterns() {
+  if (!hasDatabase) return mockInterns;
   await ensureSeeded();
   const rows = await db
     .select({
@@ -42,6 +45,15 @@ export async function getInterns() {
 }
 
 export async function getInternById(id: number) {
+  if (!hasDatabase) {
+    const intern = mockInterns.find((item) => item.id === id);
+    return intern ? {
+      intern,
+      tasks: mockTasks.filter((item) => item.internId === id),
+      messages: mockMessages.filter((item) => item.internId === id),
+      reports: mockReports.filter((item) => item.internId === id),
+    } : null;
+  }
   await ensureSeeded();
   const [intern] = await db.select().from(interns).where(eq(interns.id, id)).limit(1);
   if (!intern) return null;
@@ -64,6 +76,7 @@ export async function getInternById(id: number) {
 }
 
 export async function getTasks() {
+  if (!hasDatabase) return mockTasks;
   await ensureSeeded();
   const rows = await db
     .select({
@@ -86,6 +99,12 @@ export async function getTasks() {
 }
 
 export async function getConversations() {
+  if (!hasDatabase) {
+    return mockInterns.map(({ taskCount: _taskCount, completedCount: _completedCount, ...intern }) => {
+      const thread = mockMessages.filter((item) => item.internId === intern.id);
+      return { intern, lastMessage: thread.at(-1) ?? null, unread: thread.filter((item) => item.role === "intern" && !item.read).length };
+    });
+  }
   await ensureSeeded();
   const internList = await db.select().from(interns).orderBy(asc(interns.name));
   const conversationList = [];
@@ -110,6 +129,7 @@ export async function getConversations() {
 }
 
 export async function getMessagesForIntern(internId: number) {
+  if (!hasDatabase) return mockMessages.filter((item) => item.internId === internId);
   await ensureSeeded();
   return db
     .select()
@@ -119,6 +139,7 @@ export async function getMessagesForIntern(internId: number) {
 }
 
 export async function getReports() {
+  if (!hasDatabase) return mockReports;
   await ensureSeeded();
   const rows = await db
     .select({
@@ -139,6 +160,34 @@ export async function getReports() {
 }
 
 export async function getDashboardData() {
+  if (!hasDatabase) {
+    const taskByStatus: Record<string, number> = { todo: 0, in_progress: 0, review: 0, completed: 0 };
+    const taskByPriority: Record<string, number> = { low: 0, medium: 0, high: 0, urgent: 0 };
+    for (const task of mockTasks) {
+      taskByStatus[task.status] += 1;
+      taskByPriority[task.priority] += 1;
+    }
+    const totalTasks = mockTasks.length;
+    const completedTasks = taskByStatus.completed;
+    return {
+      totalInterns: mockInterns.length,
+      activeInterns: mockInterns.filter((item) => item.status === "active").length,
+      totalTasks,
+      completedTasks,
+      completionRate: Math.round((completedTasks / totalTasks) * 100),
+      taskByStatus,
+      taskByPriority,
+      unreadMessages: mockMessages.filter((item) => item.role === "intern" && !item.read).length,
+      pendingReports: mockReports.filter((item) => item.status === "submitted").length,
+      recentMessages: mockMessages.map((message) => {
+        const intern = mockInterns.find((item) => item.id === message.internId)!;
+        return { ...message, internName: intern.name, internDepartment: intern.department };
+      }),
+      upcomingTasks: mockTasks.filter((item) => item.status !== "completed").map(({ description: _description, createdAt: _createdAt, internDepartment: _internDepartment, ...task }) => task),
+      recentInterns: mockInterns.map(({ taskCount: _taskCount, completedCount: _completedCount, ...intern }) => intern),
+      weekly: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((label, index) => ({ label, count: [2, 4, 3, 5, 2, 1, 0][index] })),
+    };
+  }
   await ensureSeeded();
 
   const [internCount] = await db.select({ n: count() }).from(interns);

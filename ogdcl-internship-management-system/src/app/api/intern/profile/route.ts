@@ -10,8 +10,17 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const internId = Number(searchParams.get("internId") ?? 1);
 
+  if (!Number.isInteger(internId) || internId < 1) {
+    return Response.json({ ok: false, error: "A valid internId is required" }, { status: 400 });
+  }
   const [intern] = await db.select().from(interns).where(eq(interns.id, internId)).limit(1);
-  const [sup] = await db.select({ name: supervisors.name, designation: supervisors.designation }).from(supervisors).limit(1);
+  const [sup] = intern?.supervisorId
+    ? await db
+        .select({ name: supervisors.name, designation: supervisors.designation })
+        .from(supervisors)
+        .where(eq(supervisors.id, intern.supervisorId))
+        .limit(1)
+    : [];
 
   if (!intern) return Response.json({ ok: false, error: "Intern not found" }, { status: 404 });
 

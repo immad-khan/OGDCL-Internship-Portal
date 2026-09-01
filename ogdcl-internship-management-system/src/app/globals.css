@@ -98,3 +98,15 @@ body {
 .animate-pulse-soft {
   animation: pulseSoft 2s ease-in-out infinite;
 }
+
+@keyframes internEnter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes internPop {
+  from { opacity: 0; transform: scale(.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-enter { animation: internEnter .4s ease both; }
+.animate-pop { animation: internPop .2s ease both; }
+.animate-fade { animation: internEnter .2s ease both; }

@@ -22,9 +22,14 @@ export async function GET(request: Request) {
     .where(eq(messages.internId, internId))
     .orderBy(asc(messages.createdAt));
 
-  // Get supervisor name for display
-  const [sup] = await db.select({ name: supervisors.name }).from(supervisors).limit(1);
-  const [intern] = await db.select({ name: interns.name }).from(interns).where(eq(interns.id, internId)).limit(1);
+  const [intern] = await db
+    .select({ name: interns.name, supervisorId: interns.supervisorId })
+    .from(interns)
+    .where(eq(interns.id, internId))
+    .limit(1);
+  const [sup] = intern?.supervisorId
+    ? await db.select({ name: supervisors.name }).from(supervisors).where(eq(supervisors.id, intern.supervisorId)).limit(1)
+    : [];
 
   return Response.json({ messages: rows, supervisorName: sup?.name ?? "Supervisor", internName: intern?.name ?? "Intern" });
 }
@@ -34,7 +39,9 @@ export async function POST(request: Request) {
   const body = await request.json();
   const internId = Number(body.internId ?? 1);
   const content = String(body.content ?? "").trim();
-  if (!content) return Response.json({ ok: false }, { status: 400 });
+  if (!Number.isInteger(internId) || internId < 1 || !content || content.length > 4000) {
+    return Response.json({ ok: false, error: "Provide a valid intern and message under 4,000 characters." }, { status: 400 });
+  }
 
   const [intern] = await db.select({ name: interns.name }).from(interns).where(eq(interns.id, internId)).limit(1);
 

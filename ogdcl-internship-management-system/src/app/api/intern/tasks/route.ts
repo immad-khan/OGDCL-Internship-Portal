@@ -10,6 +10,10 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const internId = Number(searchParams.get("internId") ?? 1);
 
+  if (!Number.isInteger(internId) || internId < 1) {
+    return Response.json({ error: "A valid internId is required" }, { status: 400 });
+  }
+
   const rows = await db
     .select({
       id: tasks.id,
@@ -25,5 +29,14 @@ export async function GET(request: Request) {
     .where(eq(tasks.internId, internId))
     .orderBy(asc(tasks.dueDate));
 
-  return Response.json({ tasks: rows });
+  const statusLabels = {
+    todo: "To do",
+    in_progress: "In progress",
+    review: "In review",
+    completed: "Completed",
+  } as const;
+
+  return Response.json({
+    tasks: rows.map((task) => ({ ...task, status: statusLabels[task.status] })),
+  });
 }

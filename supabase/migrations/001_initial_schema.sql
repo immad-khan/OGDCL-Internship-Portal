@@ -100,10 +100,10 @@ CREATE INDEX idx_messages_is_read   ON messages(is_read);
 
 INSERT INTO supervisors (name, email, password_hash, designation, department, region)
 VALUES (
-    'OGDCL Supervisor',
+    'Ishtiaque Butt',
     'immadonline702@gmail.com',
-    '$2a$12$placeholder_replace_with_real_bcrypt_hash_here_xxxxx',  -- ← REPLACE THIS
-    'Internship Supervisor',
+    '$2a$12$placeholder_replace_with_real_bcrypt_hash_here_xxxxx',
+    'Senior Manager HR & Training',
     'HR & Administration',
     'Islamabad HQ'
 );

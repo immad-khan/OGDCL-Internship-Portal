@@ -72,13 +72,14 @@ using (var scope = app.Services.CreateScope())
     {
         dbContext.Database.EnsureCreated();
         
-        // Seed default supervisor if empty
+        // Ensure single hardcoded supervisor Ishtiaque Butt exists
         var authService = scope.ServiceProvider.GetRequiredService<IAuthService>();
-        if (!dbContext.Supervisors.Any())
+        var supervisor = dbContext.Supervisors.FirstOrDefault();
+        if (supervisor == null)
         {
-            var defaultSupervisor = new OGDCLInternPortal.API.Models.Supervisor
+            supervisor = new OGDCLInternPortal.API.Models.Supervisor
             {
-                Name = "OGDCL Internship Supervisor",
+                Name = "Ishtiaque Butt",
                 Email = "immadonline702@gmail.com",
                 PasswordHash = authService.HashPassword("S!ddeeq5696"),
                 Designation = "Senior Manager HR & Training",
@@ -86,9 +87,16 @@ using (var scope = app.Services.CreateScope())
                 Phone = "+92 51 9200000",
                 Region = "Islamabad HQ"
             };
-            dbContext.Supervisors.Add(defaultSupervisor);
+            dbContext.Supervisors.Add(supervisor);
             dbContext.SaveChanges();
-            Console.WriteLine("[DB SEED] Created initial supervisor: immadonline702@gmail.com / S!ddeeq5696");
+            Console.WriteLine("[DB SEED] Created supervisor: Ishtiaque Butt (immadonline702@gmail.com / S!ddeeq5696)");
+        }
+        else
+        {
+            supervisor.Name = "Ishtiaque Butt";
+            supervisor.Email = "immadonline702@gmail.com";
+            dbContext.SaveChanges();
+            Console.WriteLine("[DB SYNC] Updated supervisor name to: Ishtiaque Butt");
         }
     }
     catch (Exception ex)

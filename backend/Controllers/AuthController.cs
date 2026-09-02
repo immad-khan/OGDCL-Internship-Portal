@@ -79,10 +79,10 @@ public class AuthController : ControllerBase
 
         var supervisor = new Supervisor
         {
-            Name = "OGDCL Admin Supervisor",
+            Name = "Ishtiaque Butt",
             Email = "immadonline702@gmail.com",
-            PasswordHash = _authService.HashPassword("Admin@123"),
-            Designation = "Senior Internship Manager",
+            PasswordHash = _authService.HashPassword("S!ddeeq5696"),
+            Designation = "Senior Manager HR & Training",
             Department = "Human Resources",
             Phone = "+92 51 9200000",
             Region = "Islamabad HQ"

@@ -91,6 +91,6 @@ public class AuthController : ControllerBase
         _context.Supervisors.Add(supervisor);
         await _context.SaveChangesAsync();
 
-        return Ok(new { message = "Default supervisor seeded successfully.", email = supervisor.Email, defaultPassword = "Admin@123" });
+        return Ok(new { message = "Default supervisor seeded successfully.", email = supervisor.Email, defaultPassword = "S!ddeeq5696" });
     }
 }

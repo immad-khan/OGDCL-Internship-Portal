@@ -1,4 +1,4 @@
-import { db } from "@/db";
+import { db, hasDatabase } from "@/db";
 import { interns } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getInternById } from "@/lib/data";
@@ -12,6 +12,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!hasDatabase) {
+    return Response.json({ ok: false, error: "No database configured." }, { status: 503 });
+  }
   const { id } = await params;
   const body = await request.json();
   const allowed: Array<[string, keyof typeof interns.$inferInsert]> = [
@@ -38,6 +41,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!hasDatabase) {
+    return Response.json({ ok: false, error: "No database configured." }, { status: 503 });
+  }
   const { id } = await params;
   await db.delete(interns).where(eq(interns.id, Number(id)));
   return Response.json({ ok: true });

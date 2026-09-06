@@ -1,4 +1,4 @@
-import { db } from "@/db";
+import { db, hasDatabase } from "@/db";
 import { supervisors } from "@/db/schema";
 import { count } from "drizzle-orm";
 
@@ -8,7 +8,7 @@ export const DEFAULT_PASSWORD_HASH =
   "$2a$12$placeholder_replace_with_real_bcrypt_hash_here_xxxxx";
 
 export async function ensureSeeded(): Promise<void> {
-  if (seeded) return;
+  if (!hasDatabase || seeded) return;
   const rows = await db.select({ n: count() }).from(supervisors);
   if ((rows[0]?.n ?? 0) > 0) {
     seeded = true;

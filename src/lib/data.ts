@@ -1,4 +1,4 @@
-import { db } from "@/db";
+import { db, hasDatabase } from "@/db";
 import {
   interns,
   supervisors,
@@ -10,12 +10,14 @@ import { eq, desc, asc, count, and, gte, lte, sql } from "drizzle-orm";
 import { ensureSeeded } from "@/lib/seed";
 
 export async function getSupervisor() {
+  if (!hasDatabase) return null;
   await ensureSeeded();
   const rows = await db.select().from(supervisors).limit(1);
   return rows[0] ?? null;
 }
 
 export async function getInterns() {
+  if (!hasDatabase) return [];
   await ensureSeeded();
   const rows = await db
     .select({
@@ -42,6 +44,7 @@ export async function getInterns() {
 }
 
 export async function getInternById(id: number) {
+  if (!hasDatabase) return null;
   await ensureSeeded();
   const [intern] = await db.select().from(interns).where(eq(interns.id, id)).limit(1);
   if (!intern) return null;
@@ -64,6 +67,7 @@ export async function getInternById(id: number) {
 }
 
 export async function getTasks() {
+  if (!hasDatabase) return [];
   await ensureSeeded();
   const rows = await db
     .select({
@@ -86,6 +90,7 @@ export async function getTasks() {
 }
 
 export async function getConversations() {
+  if (!hasDatabase) return [];
   await ensureSeeded();
   const internList = await db.select().from(interns).orderBy(asc(interns.name));
   const conversationList = [];
@@ -110,6 +115,7 @@ export async function getConversations() {
 }
 
 export async function getMessagesForIntern(internId: number) {
+  if (!hasDatabase) return [];
   await ensureSeeded();
   return db
     .select()
@@ -119,6 +125,7 @@ export async function getMessagesForIntern(internId: number) {
 }
 
 export async function getReports() {
+  if (!hasDatabase) return [];
   await ensureSeeded();
   const rows = await db
     .select({
@@ -139,6 +146,23 @@ export async function getReports() {
 }
 
 export async function getDashboardData() {
+  if (!hasDatabase) {
+    return {
+      totalInterns: 0,
+      activeInterns: 0,
+      totalTasks: 0,
+      completedTasks: 0,
+      completionRate: 0,
+      taskByStatus: { todo: 0, in_progress: 0, review: 0, completed: 0 },
+      taskByPriority: { low: 0, medium: 0, high: 0, urgent: 0 },
+      unreadMessages: 0,
+      pendingReports: 0,
+      recentMessages: [],
+      upcomingTasks: [],
+      recentInterns: [],
+      weekly: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((label) => ({ label, count: 0 })),
+    };
+  }
   await ensureSeeded();
 
   const [internCount] = await db.select({ n: count() }).from(interns);

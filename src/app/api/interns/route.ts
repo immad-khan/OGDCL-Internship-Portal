@@ -1,4 +1,4 @@
-import { db } from "@/db";
+import { db, hasDatabase } from "@/db";
 import { interns, supervisors } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { ensureSeeded, DEFAULT_PASSWORD_HASH } from "@/lib/seed";
@@ -13,6 +13,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!hasDatabase) {
+    return Response.json({ ok: false, error: "No database configured." }, { status: 503 });
+  }
   await ensureSeeded();
   const body = await request.json();
   const name = String(body.name ?? "").trim();

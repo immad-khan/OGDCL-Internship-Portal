@@ -93,26 +93,39 @@ export async function getTasks() {
 export async function getConversations() {
   if (!hasDatabase) return [];
   await ensureSeeded();
+
   const internList = await db.select().from(interns).orderBy(asc(interns.name));
-  const conversationList = [];
-  for (const intern of internList) {
-    const [last] = await db
-      .select()
-      .from(messages)
-      .where(eq(messages.internId, intern.id))
-      .orderBy(desc(messages.createdAt))
-      .limit(1);
-    const unread = await db
-      .select({ n: count() })
-      .from(messages)
-      .where(and(eq(messages.internId, intern.id), eq(messages.role, "intern"), eq(messages.isRead, false)));
-    conversationList.push({
-      intern,
-      lastMessage: last ?? null,
-      unread: unread[0]?.n ?? 0,
-    });
+  if (internList.length === 0) return [];
+
+  // Batch: all messages ordered by time (pick first per intern in JS)
+  const allMessages = await db
+    .select({
+      internId: messages.internId,
+      content: messages.content,
+      role: messages.role,
+      createdAt: messages.createdAt,
+    })
+    .from(messages)
+    .orderBy(desc(messages.createdAt));
+
+  // Batch: unread counts grouped by intern
+  const unreadRows = await db
+    .select({ internId: messages.internId, n: count() })
+    .from(messages)
+    .where(and(eq(messages.role, "intern"), eq(messages.isRead, false)))
+    .groupBy(messages.internId);
+
+  const unreadMap = new Map<number, number>(unreadRows.map((r) => [r.internId, Number(r.n)]));
+  const lastMsgMap = new Map<number, (typeof allMessages)[number]>();
+  for (const msg of allMessages) {
+    if (!lastMsgMap.has(msg.internId)) lastMsgMap.set(msg.internId, msg);
   }
-  return conversationList;
+
+  return internList.map((intern) => ({
+    intern,
+    lastMessage: lastMsgMap.get(intern.id) ?? null,
+    unread: unreadMap.get(intern.id) ?? 0,
+  }));
 }
 
 export async function getMessagesForIntern(internId: number) {
@@ -238,8 +251,17 @@ export const getDashboardData = cache(async () => {
   // weekly activity bar data (last 7 days task+message activity)
   const weekly: Array<{ label: string; count: number }> = [];
   const now = new Date();
-  const taskCreated = await db.select({ createdAt: tasks.createdAt, dp: sql`1` }).from(tasks);
-  const msgCreated = await db.select({ createdAt: messages.createdAt, dp: sql`1` }).from(messages);
+  const weekAgo = new Date(now);
+  weekAgo.setDate(now.getDate() - 6);
+  weekAgo.setHours(0, 0, 0, 0);
+  const taskCreated = await db
+    .select({ createdAt: tasks.createdAt })
+    .from(tasks)
+    .where(gte(tasks.createdAt, weekAgo));
+  const msgCreated = await db
+    .select({ createdAt: messages.createdAt })
+    .from(messages)
+    .where(gte(messages.createdAt, weekAgo));
   const events = [
     ...taskCreated.map((e) => ({ at: new Date(e.createdAt).getTime(), n: 1 })),
     ...msgCreated.map((e) => ({ at: new Date(e.createdAt).getTime(), n: 1 })),

@@ -91,13 +91,19 @@ export function MessagesConsole({
     loadConversations();
   }, [selectedId, loadMessages, loadConversations]);
 
-  // Poll for new activity
+  // Poll for new activity (paused while the tab is hidden)
   useEffect(() => {
-    const t = setInterval(() => {
+    const poll = () => {
+      if (document.hidden) return;
       loadConversations();
       if (selectedId != null) loadMessages(selectedId);
-    }, 5000);
-    return () => clearInterval(t);
+    };
+    const t = setInterval(poll, 30000);
+    document.addEventListener("visibilitychange", poll);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener("visibilitychange", poll);
+    };
   }, [selectedId, loadConversations, loadMessages]);
 
   // Auto-scroll

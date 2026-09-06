@@ -1,4 +1,4 @@
-import { db, hasDatabase } from "@/db";
+import { db } from "@/db";
 import {
   interns,
   supervisors,
@@ -8,10 +8,8 @@ import {
 } from "@/db/schema";
 import { eq, desc, asc, count, and, gte, lte, sql } from "drizzle-orm";
 import { ensureSeeded } from "@/lib/seed";
-import { mockInterns, mockMessages, mockReports, mockSupervisor, mockTasks } from "@/lib/mock-data";
 
 export async function getSupervisor() {
-  if (!hasDatabase) return mockSupervisor;
   await ensureSeeded();
   const rows = await db.select().from(supervisors).limit(1);
   return rows[0] ?? null;
@@ -66,7 +64,6 @@ export async function getInternById(id: number) {
 }
 
 export async function getTasks() {
-  if (!hasDatabase) return mockTasks;
   await ensureSeeded();
   const rows = await db
     .select({
@@ -89,12 +86,6 @@ export async function getTasks() {
 }
 
 export async function getConversations() {
-  if (!hasDatabase) {
-    return mockInterns.map(({ taskCount: _taskCount, completedCount: _completedCount, ...intern }) => {
-      const thread = mockMessages.filter((item) => item.internId === intern.id);
-      return { intern, lastMessage: thread.at(-1) ?? null, unread: thread.filter((item) => item.role === "intern" && !item.read).length };
-    });
-  }
   await ensureSeeded();
   const internList = await db.select().from(interns).orderBy(asc(interns.name));
   const conversationList = [];

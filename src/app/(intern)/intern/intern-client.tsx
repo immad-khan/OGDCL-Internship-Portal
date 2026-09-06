@@ -74,11 +74,6 @@ function ScheduleItem({ time, title, meta, color }: { time: string; title: strin
   return <div className="flex gap-3"><p className="w-9 pt-0.5 text-[11px] font-bold text-[#7188a7]">{time}</p><div className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${color}`} /><div><p className="text-[13px] font-bold text-[#1b3554]">{title}</p><p className="mt-1 text-[11px] text-[#8096b1]">{meta}</p></div></div>;
 }
 
-function FileRow({ name, meta, type }: { name: string; meta: string; type: "xlsx" | "doc" | "pdf" }) {
-  const colors = { xlsx: "bg-[#eaf8ef] text-[#3b9c68]", doc: "bg-[#edf5ff] text-[#3a7ec2]", pdf: "bg-[#fff0ef] text-[#d96b65]" };
-  return <button className="flex w-full items-center gap-3 rounded-xl p-2 text-left transition hover:bg-[#f7fafc]"><div className={`grid h-9 w-9 place-items-center rounded-lg ${colors[type]}`}><FileText className="h-[17px] w-[17px]" /></div><div className="min-w-0 flex-1"><p className="truncate text-[13px] font-bold text-[#203957]">{name}</p><p className="mt-0.5 truncate text-[11px] text-[#8499b3]">{meta}</p></div><MoreHorizontal className="h-4 w-4 text-[#a2b3c7]" /></button>;
-}
-
 function Overview({ tasks, onNavigate, onTaskSelect }: { tasks: Task[]; onNavigate: (page: Page) => void; onTaskSelect: (task: Task) => void }) {
   const { internName } = useContext(InternContext);
   const progress = tasks.length ? Math.round(tasks.reduce((sum, task) => sum + task.progress, 0) / tasks.length) : 0;

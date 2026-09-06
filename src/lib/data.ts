@@ -18,7 +18,6 @@ export async function getSupervisor() {
 }
 
 export async function getInterns() {
-  if (!hasDatabase) return mockInterns;
   await ensureSeeded();
   const rows = await db
     .select({
@@ -45,15 +44,6 @@ export async function getInterns() {
 }
 
 export async function getInternById(id: number) {
-  if (!hasDatabase) {
-    const intern = mockInterns.find((item) => item.id === id);
-    return intern ? {
-      intern,
-      tasks: mockTasks.filter((item) => item.internId === id),
-      messages: mockMessages.filter((item) => item.internId === id),
-      reports: mockReports.filter((item) => item.internId === id),
-    } : null;
-  }
   await ensureSeeded();
   const [intern] = await db.select().from(interns).where(eq(interns.id, id)).limit(1);
   if (!intern) return null;
@@ -118,7 +108,7 @@ export async function getConversations() {
     const unread = await db
       .select({ n: count() })
       .from(messages)
-      .where(and(eq(messages.internId, intern.id), eq(messages.role, "intern"), eq(messages.read, false)));
+      .where(and(eq(messages.internId, intern.id), eq(messages.role, "intern"), eq(messages.isRead, false)));
     conversationList.push({
       intern,
       lastMessage: last ?? null,
@@ -210,7 +200,7 @@ export async function getDashboardData() {
   const [unreadCount] = await db
     .select({ n: count() })
     .from(messages)
-    .where(and(eq(messages.role, "intern"), eq(messages.read, false)));
+    .where(and(eq(messages.role, "intern"), eq(messages.isRead, false)));
 
   const [pendingReports] = await db
     .select({ n: count() })

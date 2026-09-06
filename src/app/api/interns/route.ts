@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { interns, supervisors } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { ensureSeeded } from "@/lib/seed";
+import { ensureSeeded, DEFAULT_PASSWORD_HASH } from "@/lib/seed";
 import { getInterns } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +28,7 @@ export async function POST(request: Request) {
     .values({
       name,
       email,
+      passwordHash: DEFAULT_PASSWORD_HASH,
       phone: String(body.phone ?? "").trim() || null,
       department: String(body.department ?? "").trim() || "General",
       university: String(body.university ?? "").trim() || null,

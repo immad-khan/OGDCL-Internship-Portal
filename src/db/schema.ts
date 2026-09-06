@@ -45,6 +45,7 @@ export const supervisors = pgTable("supervisors", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
   designation: text("designation").notNull().default("Internship Supervisor"),
   department: text("department").notNull().default("HR & Administration"),
   phone: text("phone"),
@@ -55,6 +56,7 @@ export const interns = pgTable("interns", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
   phone: text("phone"),
   department: text("department").notNull(),
   university: text("university"),
@@ -87,7 +89,7 @@ export const messages = pgTable("messages", {
   senderName: text("sender_name").notNull(),
   role: text("role").notNull(), // 'supervisor' | 'intern'
   content: text("content").notNull(),
-  read: boolean("read").notNull().default(false),
+  isRead: boolean("is_read").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

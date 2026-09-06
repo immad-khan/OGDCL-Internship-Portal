@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       senderName: String(body.senderName ?? (role === "supervisor" ? "Supervisor" : "")),
       role,
       content,
-      read: role === "supervisor",
+      isRead: role === "supervisor",
     })
     .returning();
   return Response.json({ ok: true, message: created }, { status: 201 });

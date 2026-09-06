@@ -7,14 +7,15 @@ import {
   reports,
 } from "@/db/schema";
 import { eq, desc, asc, count, and, gte, lte, sql } from "drizzle-orm";
+import { cache } from "react";
 import { ensureSeeded } from "@/lib/seed";
 
-export async function getSupervisor() {
+export const getSupervisor = cache(async () => {
   if (!hasDatabase) return null;
   await ensureSeeded();
   const rows = await db.select().from(supervisors).limit(1);
   return rows[0] ?? null;
-}
+});
 
 export async function getInterns() {
   if (!hasDatabase) return [];
@@ -145,7 +146,7 @@ export async function getReports() {
   return rows;
 }
 
-export async function getDashboardData() {
+export const getDashboardData = cache(async () => {
   if (!hasDatabase) {
     return {
       totalInterns: 0,
@@ -272,4 +273,4 @@ export async function getDashboardData() {
     recentInterns,
     weekly,
   };
-}
+});

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowRight, Bell, BookOpen, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight,
@@ -76,64 +76,7 @@ function FileRow({ name, meta, type }: { name: string; meta: string; type: "xlsx
   return <button className="flex w-full items-center gap-3 rounded-xl p-2 text-left transition hover:bg-[#f7fafc]"><div className={`grid h-9 w-9 place-items-center rounded-lg ${colors[type]}`}><FileText className="h-[17px] w-[17px]" /></div><div className="min-w-0 flex-1"><p className="truncate text-[13px] font-bold text-[#203957]">{name}</p><p className="mt-0.5 truncate text-[11px] text-[#8499b3]">{meta}</p></div><MoreHorizontal className="h-4 w-4 text-[#a2b3c7]" /></button>;
 }
 
-function SplineScene({ sceneUrl, onLoaded, onFailed }: { sceneUrl: string; onLoaded: () => void; onFailed: () => void }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    let cancelled = false;
-    const failTimer = window.setTimeout(() => {
-      if (!cancelled) onFailed();
-    }, 12000);
-
-    const handleLoadComplete = () => {
-      window.clearTimeout(failTimer);
-      if (!cancelled) onLoaded();
-    };
-    const handleContextLoss = () => {
-      if (!cancelled) onFailed();
-    };
-
-    let viewer: HTMLElement | null = null;
-
-    const mount = () => {
-      if (cancelled || !container) return;
-      viewer = document.createElement("spline-viewer");
-      viewer.setAttribute("url", sceneUrl);
-      viewer.setAttribute("loading", "eager");
-      viewer.style.width = "100%";
-      viewer.style.height = "100%";
-      viewer.style.display = "block";
-      viewer.addEventListener("load-complete", handleLoadComplete);
-      viewer.addEventListener("context-loss", handleContextLoss);
-      container.appendChild(viewer);
-    };
-
-    if (customElements.get("spline-viewer")) {
-      mount();
-    } else {
-      customElements.whenDefined("spline-viewer").then(() => {
-        if (!cancelled) mount();
-      });
-    }
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(failTimer);
-      if (viewer) {
-        viewer.removeEventListener("load-complete", handleLoadComplete);
-        viewer.removeEventListener("context-loss", handleContextLoss);
-        viewer.remove();
-      }
-    };
-  }, [sceneUrl, onLoaded, onFailed]);
-
-  return <div ref={containerRef} className="absolute inset-0 h-full w-full" />;
-}
-
-function Overview({ tasks, onNavigate, onTaskSelect, splineLoaded, splineError, setSplineLoaded, setSplineError }: { tasks: Task[]; onNavigate: (page: Page) => void; onTaskSelect: (task: Task) => void; splineLoaded: boolean; splineError: boolean; setSplineLoaded: (loaded: boolean) => void; setSplineError: (error: boolean) => void }) {
+function Overview({ tasks, onNavigate, onTaskSelect }: { tasks: Task[]; onNavigate: (page: Page) => void; onTaskSelect: (task: Task) => void }) {
   const progress = Math.round(tasks.reduce((sum, task) => sum + task.progress, 0) / tasks.length);
   const completed = tasks.filter((task) => task.status === "Completed").length + 3;
   const upcoming = tasks.filter((task) => task.status !== "Completed").slice(0, 3);
@@ -158,14 +101,8 @@ function Overview({ tasks, onNavigate, onTaskSelect, splineLoaded, splineError, 
             <div className="pr-2"><p className="text-sm font-bold text-[#193958]">Placement progress</p><p className="mt-1 max-w-[130px] text-xs leading-5 text-[#6c86a2]">Ahead of the expected weekly pace.</p></div>
           </div>
         </div>
-        <div className="relative h-[340px] w-full overflow-hidden sm:h-[430px] lg:h-[520px]">
-          <SplineScene
-            sceneUrl="https://prod.spline.design/PPljLYJWAAZjGcy3/scene.splinecode"
-            onLoaded={() => setSplineLoaded(true)}
-            onFailed={() => setSplineError(true)}
-          />
-          {splineError && <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#e7f7f5] to-[#e8f4ff]"><p className="px-6 text-center text-sm font-medium text-[#547895]">The interactive 3D scene could not be loaded.</p></div>}
-          {!splineLoaded && !splineError && <div className="pointer-events-none absolute inset-0 grid place-items-center bg-gradient-to-br from-[#e7f7f5] to-[#e8f4ff]"><div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0d9f99] border-t-transparent" /></div>}
+        <div className="relative hidden h-[340px] w-full overflow-hidden sm:h-[430px] lg:grid lg:h-[520px] place-items-center bg-gradient-to-br from-[#e7f7f5] to-[#e8f4ff]">
+          <Sparkles className="h-16 w-16 text-[#0d9f99]/30" />
         </div>
       </div>
     </section>
@@ -530,8 +467,7 @@ export default function App() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [splineLoaded, setSplineLoaded] = useState(false);
-  const [splineError, setSplineError] = useState(false);
+
   const selectedCurrentTask = selectedTask ? tasks.find((task) => task.id === selectedTask.id) ?? null : null;
   const suggestedSearch = useMemo(() => tasks.filter((task) => task.title.toLowerCase().includes(search.toLowerCase())).slice(0, 3), [search, tasks]);
   const updateTask = (id: number, status: TaskStatus) => setTasks((current) => current.map((task) => task.id === id ? { ...task, status, progress: status === "Completed" ? 100 : task.progress } : task));
@@ -542,7 +478,7 @@ export default function App() {
     if (activePage === "Calendar") return <CalendarPage />;
     if (activePage === "Messages") return <MessagesPage />;
     if (activePage === "Files") return <FilesPage />;
-    return <Overview tasks={tasks} onNavigate={navigate} onTaskSelect={setSelectedTask} splineLoaded={splineLoaded} splineError={splineError} setSplineLoaded={setSplineLoaded} setSplineError={setSplineError} />;
+    return <Overview tasks={tasks} onNavigate={navigate} onTaskSelect={setSelectedTask} />;
   };
   return <div className="min-h-screen bg-[#f5f8fb] font-['Plus_Jakarta_Sans',ui-sans-serif,system-ui,sans-serif] text-[#142a47]">
     <div className="min-h-screen lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">

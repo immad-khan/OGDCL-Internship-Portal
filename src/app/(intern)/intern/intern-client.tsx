@@ -81,8 +81,9 @@ function FileRow({ name, meta, type }: { name: string; meta: string; type: "xlsx
 
 function Overview({ tasks, onNavigate, onTaskSelect }: { tasks: Task[]; onNavigate: (page: Page) => void; onTaskSelect: (task: Task) => void }) {
   const { internName } = useContext(InternContext);
-  const progress = Math.round(tasks.reduce((sum, task) => sum + task.progress, 0) / tasks.length);
-  const completed = tasks.filter((task) => task.status === "Completed").length + 3;
+  const progress = tasks.length ? Math.round(tasks.reduce((sum, task) => sum + task.progress, 0) / tasks.length) : 0;
+  const completed = tasks.filter((task) => task.status === "Completed").length;
+  const remaining = tasks.length - completed;
   const upcoming = tasks.filter((task) => task.status !== "Completed").slice(0, 3);
   return <div className="space-y-6 animate-enter">
     <section className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
@@ -94,7 +95,7 @@ function Overview({ tasks, onNavigate, onTaskSelect }: { tasks: Task[]; onNaviga
         <div className="relative z-10 p-5 sm:p-7 lg:p-8">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/75 px-3 py-1.5 text-[11px] font-bold text-[#168f8a]"><Sparkles className="h-3.5 w-3.5" /> ON TRACK THIS WEEK</div>
           <h2 className="max-w-md text-2xl font-extrabold tracking-[-0.04em] text-[#123655] sm:text-[28px]">Your internship is taking shape.</h2>
-          <p className="mt-3 max-w-lg text-sm leading-6 text-[#547895]">You have completed {completed} of 8 assigned deliverables. Keep your analysis moving and submit your weekly report by Friday.</p>
+          <p className="mt-3 max-w-lg text-sm leading-6 text-[#547895]">You have completed {completed} of {tasks.length} assigned deliverables. Keep your analysis moving and submit your weekly report by Friday.</p>
           <div className="mt-6 flex flex-wrap items-center gap-5 text-sm">
             <div><p className="font-bold text-[#133a5b]">4 weeks</p><p className="mt-0.5 text-xs text-[#6b88a2]">in the programme</p></div>
             <div className="h-8 w-px bg-[#bfe3df]" />
@@ -139,24 +140,14 @@ function Overview({ tasks, onNavigate, onTaskSelect }: { tasks: Task[]; onNaviga
         <button onClick={() => onNavigate("Calendar")} className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-[#dfe8f1] py-2.5 text-xs font-bold text-[#567292] transition hover:border-[#a9ddd8] hover:bg-[#f2fbfa] hover:text-[#078e89]">Open calendar <ArrowRight className="h-3.5 w-3.5" /></button>
       </div>
     </section>
-    <section className="grid gap-6 lg:grid-cols-2">
-      <div className="rounded-[20px] border border-[#e0e8f1] bg-white px-5 py-5 shadow-[0_8px_22px_rgba(30,62,100,0.035)] sm:px-6">
-        <PanelTitle eyebrow="Learning path" title="Process safety essentials" action={<button onClick={() => onNavigate("Learning")} className="text-xs font-bold text-[#078e89] hover:text-[#057670]">Continue</button>} />
-        <div className="mt-5 flex items-center gap-5">
-          <ProgressRing value={75} size={82} stroke={8} color="#577bdf" />
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-[#183151]">5 of 6 modules complete</p>
-            <p className="mt-1 text-xs leading-5 text-[#7d93af]">Next up: Permit to Work and isolation procedures.</p>
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#e9eef8]"><div className="h-full rounded-full bg-[#587cdd] transition-all duration-700" style={{ width: "75%" }} /></div>
-          </div>
-        </div>
-      </div>
-      <div className="rounded-[20px] border border-[#e0e8f1] bg-white px-5 py-5 shadow-[0_8px_22px_rgba(30,62,100,0.035)] sm:px-6">
-        <PanelTitle eyebrow="Shared with you" title="Latest files" action={<button onClick={() => onNavigate("Files")} className="text-xs font-bold text-[#078e89] hover:text-[#057670]">Open files</button>} />
-        <div className="mt-4 space-y-1">
-          <FileRow name="Separator train data pack.xlsx" meta="Shared by Engr. Ahmad Raza" type="xlsx" />
-          <FileRow name="Weekly report template.docx" meta="Updated yesterday" type="doc" />
-          <FileRow name="Site induction checklist.pdf" meta="Shared by HSE team" type="pdf" />
+    <section className="rounded-[20px] border border-[#e0e8f1] bg-white px-5 py-5 shadow-[0_8px_22px_rgba(30,62,100,0.035)] sm:px-6">
+      <PanelTitle eyebrow="Placement" title="Progress at a glance" action={<span className="text-xs font-medium text-[#8195b2]">{completed} of {tasks.length} done</span>} />
+      <div className="mt-5 flex items-center gap-5">
+        <ProgressRing value={progress} size={82} stroke={8} color="#577bdf" />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-bold text-[#183151]">{progress}% complete</p>
+          <p className="mt-1 text-xs leading-5 text-[#7d93af]">{remaining} task{remaining === 1 ? "" : "s"} still {remaining === 1 ? "is" : "are"} open across your placement.</p>
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#e9eef8]"><div className="h-full rounded-full bg-[#587cdd] transition-all duration-700" style={{ width: `${progress}%` }} /></div>
         </div>
       </div>
     </section>

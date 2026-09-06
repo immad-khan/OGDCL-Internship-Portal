@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowRight, Bell, BookOpen, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight,
@@ -8,16 +8,13 @@ import {
   MoreHorizontal, Paperclip, Plus, Search, Send, Settings, SlidersHorizontal, Sparkles, Target, Upload, X,
 } from "lucide-react";
 
+
+export const InternContext = createContext<{ internName: string, internDepartment: string, internInitials: string }>({ internName: "", internDepartment: "", internInitials: "" });
+
 type Page = "Overview" | "My Tasks" | "Learning" | "Calendar" | "Messages" | "Files";
 type TaskStatus = "To do" | "In progress" | "In review" | "Completed";
 type Task = { id: number; title: string; project: string; due: string; dueMeta: string; status: TaskStatus; priority: "High" | "Medium" | "Low"; progress: number };
 
-const initialTasks: Task[] = [
-  { id: 1, title: "Separator performance sensitivity analysis", project: "Process Engineering", due: "Today, 4:00 PM", dueMeta: "Due today", status: "In progress", priority: "High", progress: 68 },
-  { id: 2, title: "Complete HSE site induction module", project: "HSE Learning", due: "Tomorrow, 11:00 AM", dueMeta: "Due tomorrow", status: "To do", priority: "Medium", progress: 0 },
-  { id: 3, title: "Prepare weekly progress report", project: "Internship Programme", due: "Fri, 27 Sep", dueMeta: "This week", status: "In review", priority: "Medium", progress: 92 },
-  { id: 4, title: "Review crude oil sampling procedure", project: "Operations", due: "Mon, 30 Sep", dueMeta: "Next week", status: "To do", priority: "Low", progress: 0 },
-];
 
 const navItems: { label: Page; icon: LucideIcon; count?: number }[] = [
   { label: "Overview", icon: LayoutDashboard }, { label: "My Tasks", icon: CheckCircle2, count: 4 },
@@ -27,9 +24,11 @@ const utilityItems: { label: Page; icon: LucideIcon; count?: number }[] = [
   { label: "Messages", icon: MessageCircle, count: 2 }, { label: "Files", icon: FolderOpen },
 ];
 
-function Avatar({ size = "md", initials = "AK" }: { size?: "sm" | "md" | "lg"; initials?: string }) {
+function Avatar({ size = "md", initials }: { size?: "sm" | "md" | "lg"; initials?: string }) {
+  const { internInitials } = useContext(InternContext);
+  const displayInitials = initials || internInitials;
   const dimensions = { sm: "h-8 w-8 text-[10px]", md: "h-10 w-10 text-xs", lg: "h-14 w-14 text-base" };
-  return <div className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#0a9c98] to-[#1675bb] font-bold text-white shadow-sm ${dimensions[size]}`}>{initials}</div>;
+  return <div className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#0a9c98] to-[#1675bb] font-bold text-white shadow-sm ${dimensions[size]}`}>{displayInitials}</div>;
 }
 
 function Brand({ compact = false }: { compact?: boolean }) {
@@ -42,8 +41,9 @@ function NavButton({ item, active, onClick }: { item: { label: Page; icon: Lucid
 }
 
 function Sidebar({ activePage, onNavigate, mobile = false, onClose }: { activePage: Page; onNavigate: (page: Page) => void; mobile?: boolean; onClose?: () => void }) {
+  const { internName, internDepartment } = useContext(InternContext);
   const navigate = (page: Page) => { onNavigate(page); onClose?.(); };
-  return <aside className={`flex h-full flex-col bg-white ${mobile ? "w-[286px] shadow-2xl" : "w-[248px] border-r border-[#e4ebf2]"}`}><div className="flex h-[78px] items-center justify-between border-b border-[#e9eef4] px-6"><Brand />{mobile && <button onClick={onClose} className="rounded-lg p-1 text-[#7086a6] hover:bg-slate-100"><X className="h-5 w-5" /></button>}</div><nav className="flex-1 px-4 py-6"><p className="px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-[#91a4c1]">Workspace</p><div className="mt-2 space-y-1">{navItems.map((item) => <NavButton key={item.label} item={item} active={activePage === item.label} onClick={() => navigate(item.label)} />)}</div><p className="mt-7 px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-[#91a4c1]">Connect</p><div className="mt-2 space-y-1">{utilityItems.map((item) => <NavButton key={item.label} item={item} active={activePage === item.label} onClick={() => navigate(item.label)} />)}</div></nav><div className="m-4 rounded-2xl bg-[#f5f8fb] p-3"><div className="flex items-center gap-2.5"><Avatar size="sm" /><div className="min-w-0 flex-1"><p className="truncate text-sm font-bold text-[#182b49]">Ayesha Khan</p><p className="truncate text-xs text-[#7b91b1]">Process Engineering</p></div><ChevronDown className="h-4 w-4 text-[#8397b4]" /></div></div></aside>;
+  return <aside className={`flex h-full flex-col bg-white ${mobile ? "w-[286px] shadow-2xl" : "w-[248px] border-r border-[#e4ebf2]"}`}><div className="flex h-[78px] items-center justify-between border-b border-[#e9eef4] px-6"><Brand />{mobile && <button onClick={onClose} className="rounded-lg p-1 text-[#7086a6] hover:bg-slate-100"><X className="h-5 w-5" /></button>}</div><nav className="flex-1 px-4 py-6"><p className="px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-[#91a4c1]">Workspace</p><div className="mt-2 space-y-1">{navItems.map((item) => <NavButton key={item.label} item={item} active={activePage === item.label} onClick={() => navigate(item.label)} />)}</div><p className="mt-7 px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-[#91a4c1]">Connect</p><div className="mt-2 space-y-1">{utilityItems.map((item) => <NavButton key={item.label} item={item} active={activePage === item.label} onClick={() => navigate(item.label)} />)}</div></nav><div className="m-4 rounded-2xl bg-[#f5f8fb] p-3"><div className="flex items-center gap-2.5"><Avatar size="sm" /><div className="min-w-0 flex-1"><p className="truncate text-sm font-bold text-[#182b49]">{internName}</p><p className="truncate text-xs text-[#7b91b1]">{internDepartment}</p></div><ChevronDown className="h-4 w-4 text-[#8397b4]" /></div></div></aside>;
 }
 
 function ProgressRing({ value, size = 116, stroke = 10, color = "#13aaa2" }: { value: number; size?: number; stroke?: number; color?: string }) {
@@ -77,12 +77,13 @@ function FileRow({ name, meta, type }: { name: string; meta: string; type: "xlsx
 }
 
 function Overview({ tasks, onNavigate, onTaskSelect }: { tasks: Task[]; onNavigate: (page: Page) => void; onTaskSelect: (task: Task) => void }) {
+  const { internName } = useContext(InternContext);
   const progress = Math.round(tasks.reduce((sum, task) => sum + task.progress, 0) / tasks.length);
   const completed = tasks.filter((task) => task.status === "Completed").length + 3;
   const upcoming = tasks.filter((task) => task.status !== "Completed").slice(0, 3);
   return <div className="space-y-6 animate-enter">
     <section className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
-      <div><p className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#0c9f99]"><span className="h-2 w-2 rounded-full bg-[#14b2a8] animate-pulse" />Tuesday, 24 September</p><h1 className="text-3xl font-extrabold tracking-[-0.045em] text-[#10223f] sm:text-[34px]">Good morning, Ayesha.</h1><p className="mt-2 text-[15px] text-[#6981a3]">Here is a clear view of your placement progress and what needs your attention.</p></div>
+      <div><p className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#0c9f99]"><span className="h-2 w-2 rounded-full bg-[#14b2a8] animate-pulse" />Tuesday, 24 September</p><h1 className="text-3xl font-extrabold tracking-[-0.045em] text-[#10223f] sm:text-[34px]">Good morning, {internName.split(" ")[0]}.</h1><p className="mt-2 text-[15px] text-[#6981a3]">Here is a clear view of your placement progress and what needs your attention.</p></div>
       <button onClick={() => onNavigate("My Tasks")} className="group inline-flex items-center justify-center gap-2 self-start rounded-xl bg-[#0d9f99] px-4 py-3 text-sm font-bold text-white shadow-[0_8px_18px_rgba(13,159,153,0.2)] transition hover:-translate-y-0.5 hover:bg-[#078f8a] md:self-auto">View my tasks <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></button>
     </section>
     <section className="relative overflow-hidden rounded-[22px] bg-gradient-to-br from-[#e7f7f5] via-[#f0faf9] to-[#e8f4ff] p-0 sm:p-0">
@@ -325,7 +326,7 @@ function MessagesPage() {
         <div className="flex-1 space-y-4 bg-[#fbfcfe] p-5">
           <div className="max-w-[490px] rounded-2xl rounded-tl-sm bg-white p-4 text-sm leading-6 text-[#284361] shadow-sm">
             <p>Sir, I finished the first simulation run of the separator train. The recovery improved by about 2.1%.</p>
-            <span className="mt-2 block text-[10px] font-medium text-[#91a2b9]">Ayesha Khan | 10:02 AM</span>
+            <span className="mt-2 block text-[10px] font-medium text-[#91a2b9]">{internName} | 10:02 AM</span>
           </div>
           {messages.map((item, index) => (
             <div key={index} className={`max-w-[520px] rounded-2xl p-4 text-sm leading-6 shadow-sm ${item.from === "me" ? "ml-auto rounded-br-sm bg-[#0d9f99] text-white" : "rounded-tl-sm bg-white text-[#294563]"}`}>
@@ -459,7 +460,19 @@ function NotificationPanel({ onClose }: { onClose: () => void }) {
   </div>;
 }
 
-export default function App() {
+
+export function InternClient({
+  initialTasks,
+  internName,
+  internDepartment,
+  internInitials,
+}: {
+  initialTasks: Task[];
+  internName: string;
+  internDepartment: string;
+  internInitials: string;
+}) {
+
   const [activePage, setActivePage] = useState<Page>("Overview");
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -470,7 +483,26 @@ export default function App() {
 
   const selectedCurrentTask = selectedTask ? tasks.find((task) => task.id === selectedTask.id) ?? null : null;
   const suggestedSearch = useMemo(() => tasks.filter((task) => task.title.toLowerCase().includes(search.toLowerCase())).slice(0, 3), [search, tasks]);
-  const updateTask = (id: number, status: TaskStatus) => setTasks((current) => current.map((task) => task.id === id ? { ...task, status, progress: status === "Completed" ? 100 : task.progress } : task));
+  const updateTask = async (id: number, status: TaskStatus) => {
+    // Optimistic update
+    setTasks((current) => current.map((task) => task.id === id ? { ...task, status, progress: status === "Completed" ? 100 : task.progress } : task));
+    
+    // Convert status to DB format
+    let dbStatus = "todo";
+    if (status === "In progress") dbStatus = "in_progress";
+    if (status === "In review") dbStatus = "review";
+    if (status === "Completed") dbStatus = "completed";
+
+    try {
+      await fetch(`/api/intern/tasks/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: dbStatus })
+      });
+    } catch (e) {
+      console.error("Failed to update task", e);
+    }
+  };
   const navigate = (page: Page) => { setActivePage(page); setSearch(""); };
   const content = () => {
     if (activePage === "My Tasks") return <TaskPage tasks={tasks} onUpdate={updateTask} onTaskSelect={setSelectedTask} />;
@@ -480,7 +512,7 @@ export default function App() {
     if (activePage === "Files") return <FilesPage />;
     return <Overview tasks={tasks} onNavigate={navigate} onTaskSelect={setSelectedTask} />;
   };
-  return <div className="min-h-screen bg-[#f5f8fb] font-['Plus_Jakarta_Sans',ui-sans-serif,system-ui,sans-serif] text-[#142a47]">
+  return <InternContext.Provider value={{ internName, internDepartment, internInitials }}><div className="min-h-screen bg-[#f5f8fb] font-['Plus_Jakarta_Sans',ui-sans-serif,system-ui,sans-serif] text-[#142a47]">
     <div className="min-h-screen lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
       <div className="hidden lg:block"><Sidebar activePage={activePage} onNavigate={navigate} /></div>
       <div className="min-w-0">
@@ -508,7 +540,7 @@ export default function App() {
             <button onClick={() => { setProfileOpen(!profileOpen); setNotificationsOpen(false); }} className="flex items-center gap-2.5 rounded-xl p-1 text-left hover:bg-[#f7f9fb]">
               <Avatar size="sm" />
               <div className="hidden pr-1 sm:block">
-                <p className="text-sm font-bold leading-4 text-[#1c3553]">Ayesha Khan</p>
+                <p className="text-sm font-bold leading-4 text-[#1c3553]">{internName}</p>
                 <p className="mt-1 text-[11px] text-[#7890ae]">Intern</p>
               </div>
               <ChevronDown className="hidden h-4 w-4 text-[#8398b3] sm:block" />
@@ -527,5 +559,5 @@ export default function App() {
       <div className="relative h-full"><Sidebar mobile activePage={activePage} onNavigate={navigate} onClose={() => setMenuOpen(false)} /></div>
     </div>}
     {selectedCurrentTask && <TaskModal task={selectedCurrentTask} onClose={() => setSelectedTask(null)} onUpdate={updateTask} />}
-  </div>;
+  </div></InternContext.Provider>;
 }

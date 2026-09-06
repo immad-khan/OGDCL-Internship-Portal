@@ -25,6 +25,6 @@ export async function PATCH(request: Request) {
     return Response.json({ ok: false }, { status: 404 });
   }
   await db.update(supervisors).set(patch).where(eq(supervisors.id, existing.id));
-  revalidateTag("supervisor");
+  revalidateTag("supervisor", "minutes");
   return Response.json({ ok: true });
 }

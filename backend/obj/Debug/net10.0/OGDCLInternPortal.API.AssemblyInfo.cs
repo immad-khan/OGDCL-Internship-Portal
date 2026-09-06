@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OGDCLInternPortal.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+496401f62320e8e13b057bf47e3de0a9da7ed0cc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+50aacd448a39ade07f80f6883431eb3adf8a0437")]
 [assembly: System.Reflection.AssemblyProductAttribute("OGDCLInternPortal.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OGDCLInternPortal.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

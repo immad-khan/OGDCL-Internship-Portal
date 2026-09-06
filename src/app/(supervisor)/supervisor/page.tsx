@@ -111,7 +111,7 @@ export default async function DashboardPage() {
         <div>
           <p className="text-sm text-white/80">{todayStr}</p>
           <h2 className="mt-1 text-2xl font-semibold tracking-tight">
-            Assalam-o-Alaikum, {sup?.name?.replace("Engr. ", "")} 👋
+            Assalam-o-Alaikum, {sup?.name?.replace("Engr. ", "")}
           </h2>
           <p className="mt-1 text-sm text-white/80">
             Here&apos;s what&apos;s happening with your interns today.

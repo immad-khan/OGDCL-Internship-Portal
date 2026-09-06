@@ -290,6 +290,7 @@ function CalendarPage() {
 }
 
 function MessagesPage() {
+  const { internName } = useContext(InternContext);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([{ from: "supervisor", text: "Nice work, Ayesha. Please attach the sensitivity analysis when it is ready.", time: "10:02 AM" }]);
   const sendMessage = () => { if (message.trim()) { setMessages((current) => [...current, { from: "me", text: message.trim(), time: "Now" }]); setMessage(""); } };

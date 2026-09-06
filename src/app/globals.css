@@ -136,3 +136,179 @@ body {
 .animate-enter { animation: internEnter .4s ease both; }
 .animate-pop { animation: internPop .2s ease both; }
 .animate-fade { animation: internEnter .2s ease both; }
+
+/* ===================================================================== */
+/* Landing page (mkdir marketing surface) — shared with sign-in           */
+/* ===================================================================== */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ---------- Photography treatments ---------- */
+.hero-photo {
+  filter: saturate(0.35) contrast(1.2) brightness(0.4);
+}
+.panel-photo {
+  filter: grayscale(0.5) saturate(0.6) contrast(1.25) brightness(0.35);
+}
+
+/* ---------- Surface textures ---------- */
+.grid-overlay {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+.noise {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.glow-green {
+  box-shadow:
+    0 0 0 1px rgba(45, 212, 191, 0.35),
+    0 0 24px rgba(45, 212, 191, 0.35),
+    0 0 60px rgba(20, 184, 166, 0.15);
+}
+.card-dark {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.card-dark:hover {
+  border-color: rgba(45, 212, 191, 0.28);
+}
+
+/* ---------- Timeline ---------- */
+.timeline-line {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(45, 212, 191, 0.55) 8%,
+    rgba(45, 212, 191, 0.55) 92%,
+    transparent
+  );
+}
+
+/* ---------- Reveal ---------- */
+[data-reveal] {
+  opacity: 0;
+  transition:
+    opacity 0.8s cubic-bezier(0.2, 0.65, 0.2, 1) var(--reveal-delay, 0ms),
+    transform 0.8s cubic-bezier(0.2, 0.65, 0.2, 1) var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+[data-reveal="up"] {
+  transform: translateY(28px);
+}
+[data-reveal="left"] {
+  transform: translateX(-32px);
+}
+[data-reveal="right"] {
+  transform: translateX(32px);
+}
+[data-reveal="none"] {
+  transform: none;
+}
+[data-reveal][data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Keyframes ---------- */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(45, 212, 191, 0);
+  }
+}
+@keyframes bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes ring-draw {
+  from {
+    stroke-dashoffset: var(--ring-total);
+  }
+}
+@keyframes drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.anim-fade-up {
+  animation: fade-up 0.9s cubic-bezier(0.2, 0.65, 0.2, 1) both;
+}
+.anim-delay-1 {
+  animation-delay: 120ms;
+}
+.anim-delay-2 {
+  animation-delay: 240ms;
+}
+.anim-delay-3 {
+  animation-delay: 360ms;
+}
+.anim-delay-4 {
+  animation-delay: 480ms;
+}
+.pulse-dot {
+  animation: pulse-dot 2.2s ease-out infinite;
+}
+.bar-grow {
+  transform-origin: left;
+  animation: bar-grow 1.2s cubic-bezier(0.2, 0.65, 0.2, 1) 500ms both;
+}
+.ring-draw {
+  animation: ring-draw 1.4s cubic-bezier(0.2, 0.65, 0.2, 1) 400ms both;
+}
+.drift {
+  animation: drift 7s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .anim-fade-up,
+  .pulse-dot,
+  .bar-grow,
+  .ring-draw,
+  .drift {
+    animation: none;
+  }
+}

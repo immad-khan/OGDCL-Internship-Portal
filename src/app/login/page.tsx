@@ -6,7 +6,6 @@ import { Activity, Check, Lock, ShieldCheck } from "@/components/icons";
 import { SignInForm } from "./sign-in-form";
 
 export const metadata: Metadata = { title: "Sign in" };
-export const dynamic = "force-dynamic";
 
 const PANEL_IMAGE =
   "https://images.pexels.com/photos/10396416/pexels-photo-10396416.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1400&w=1000";

@@ -8,14 +8,19 @@ import {
 } from "@/db/schema";
 import { eq, desc, asc, count, and, gte, lte, sql } from "drizzle-orm";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { ensureSeeded } from "@/lib/seed";
 
-export const getSupervisor = cache(async () => {
-  if (!hasDatabase) return null;
-  await ensureSeeded();
-  const rows = await db.select().from(supervisors).limit(1);
-  return rows[0] ?? null;
-});
+export const getSupervisor = unstable_cache(
+  async () => {
+    if (!hasDatabase) return null;
+    await ensureSeeded();
+    const rows = await db.select().from(supervisors).limit(1);
+    return rows[0] ?? null;
+  },
+  ["supervisor-profile"],
+  { revalidate: 60, tags: ["supervisor"] },
+);
 
 export async function getInterns() {
   if (!hasDatabase) return [];

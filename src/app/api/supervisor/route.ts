@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { supervisors } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { revalidateTag } from "next/cache";
 import { ensureSeeded } from "@/lib/seed";
 
 export const dynamic = "force-dynamic";
@@ -24,5 +25,6 @@ export async function PATCH(request: Request) {
     return Response.json({ ok: false }, { status: 404 });
   }
   await db.update(supervisors).set(patch).where(eq(supervisors.id, existing.id));
+  revalidateTag("supervisor");
   return Response.json({ ok: true });
 }

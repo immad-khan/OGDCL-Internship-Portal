@@ -2,10 +2,6 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
 const databaseUrl = process.env.DATABASE_URL;
-// The supervisor interface can be previewed with the in-memory sample data
-// when a database has not been configured yet. Database queries are only made
-// by the data layer when this flag is true.
-export const hasDatabase = Boolean(databaseUrl);
 
 const globalForDb = globalThis as typeof globalThis & {
   __arenaNextJsPostgresqlPool?: Pool;

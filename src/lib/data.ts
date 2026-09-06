@@ -110,7 +110,6 @@ export async function getConversations() {
 }
 
 export async function getMessagesForIntern(internId: number) {
-  if (!hasDatabase) return mockMessages.filter((item) => item.internId === internId);
   await ensureSeeded();
   return db
     .select()
@@ -120,7 +119,6 @@ export async function getMessagesForIntern(internId: number) {
 }
 
 export async function getReports() {
-  if (!hasDatabase) return mockReports;
   await ensureSeeded();
   const rows = await db
     .select({
@@ -141,34 +139,6 @@ export async function getReports() {
 }
 
 export async function getDashboardData() {
-  if (!hasDatabase) {
-    const taskByStatus: Record<string, number> = { todo: 0, in_progress: 0, review: 0, completed: 0 };
-    const taskByPriority: Record<string, number> = { low: 0, medium: 0, high: 0, urgent: 0 };
-    for (const task of mockTasks) {
-      taskByStatus[task.status] += 1;
-      taskByPriority[task.priority] += 1;
-    }
-    const totalTasks = mockTasks.length;
-    const completedTasks = taskByStatus.completed;
-    return {
-      totalInterns: mockInterns.length,
-      activeInterns: mockInterns.filter((item) => item.status === "active").length,
-      totalTasks,
-      completedTasks,
-      completionRate: Math.round((completedTasks / totalTasks) * 100),
-      taskByStatus,
-      taskByPriority,
-      unreadMessages: mockMessages.filter((item) => item.role === "intern" && !item.read).length,
-      pendingReports: mockReports.filter((item) => item.status === "submitted").length,
-      recentMessages: mockMessages.map((message) => {
-        const intern = mockInterns.find((item) => item.id === message.internId)!;
-        return { ...message, internName: intern.name, internDepartment: intern.department };
-      }),
-      upcomingTasks: mockTasks.filter((item) => item.status !== "completed").map(({ description: _description, createdAt: _createdAt, internDepartment: _internDepartment, ...task }) => task),
-      recentInterns: mockInterns.map(({ taskCount: _taskCount, completedCount: _completedCount, ...intern }) => intern),
-      weekly: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((label, index) => ({ label, count: [2, 4, 3, 5, 2, 1, 0][index] })),
-    };
-  }
   await ensureSeeded();
 
   const [internCount] = await db.select({ n: count() }).from(interns);

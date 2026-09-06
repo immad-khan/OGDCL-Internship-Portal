@@ -50,6 +50,7 @@ export default async function InternPage() {
 
   return (
     <InternClient 
+      internId={currentIntern.id}
       initialTasks={mappedTasks} 
       internName={currentIntern.name}
       internDepartment={currentIntern.department}

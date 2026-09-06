@@ -21,17 +21,42 @@ export function SignInForm({ initialRole }: { initialRole: Role }) {
   const [email, setEmail] = useState(role === "supervisor" ? "supervisor@ogdcl.com" : "intern@ogdcl.com");
   const [password, setPassword] = useState(role === "supervisor" ? "Supervisor@123" : "Intern@123");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   function switchRole(next: Role) {
     setRole(next);
+    setError("");
     const params = new URLSearchParams(searchParams.toString());
     params.set("role", next);
     router.replace(`/login?${params.toString()}`, { scroll: false });
   }
 
-  function submit(event: React.FormEvent<HTMLFormElement>) {
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    router.push(role === "supervisor" ? "/supervisor" : "/intern");
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, role }),
+      });
+      const data = await res.json();
+      
+      if (!res.ok) {
+        setError(data.error || "Failed to sign in.");
+        return;
+      }
+      
+      router.push(role === "supervisor" ? "/supervisor" : "/intern");
+      router.refresh();
+    } catch (err) {
+      setError("An unexpected error occurred.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -151,12 +176,19 @@ export function SignInForm({ initialRole }: { initialRole: Role }) {
         </label>
       </div>
 
+      {error && (
+        <div className="mt-4 rounded-lg bg-red-500/10 p-3 text-center text-[13px] font-medium text-red-400 border border-red-500/20">
+          {error}
+        </div>
+      )}
+
       <button
         type="submit"
-        className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-brand-500 text-[15px] font-semibold text-ink-950 shadow-[0_10px_30px_rgba(20,184,166,0.25)] transition hover:bg-brand-400 hover:shadow-[0_10px_36px_rgba(20,184,166,0.35)]"
+        disabled={isLoading}
+        className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-brand-500 text-[15px] font-semibold text-ink-950 shadow-[0_10px_30px_rgba(20,184,166,0.25)] transition hover:bg-brand-400 hover:shadow-[0_10px_36px_rgba(20,184,166,0.35)] disabled:pointer-events-none disabled:opacity-70"
       >
-        Continue as {ROLE_META[role].label}
-        <ArrowRight className="h-4 w-4" />
+        {isLoading ? "Signing in..." : `Continue as ${ROLE_META[role].label}`}
+        {!isLoading && <ArrowRight className="h-4 w-4" />}
       </button>
 
       <div className="mt-6 rounded-lg border border-dashed border-white/10 bg-white/[0.02] px-4 py-3 text-[12.5px] text-ink-300">

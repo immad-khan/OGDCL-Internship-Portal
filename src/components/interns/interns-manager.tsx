@@ -34,15 +34,13 @@ type Intern = {
 };
 
 const DEPARTMENTS = [
-  "Petroleum Engineering",
+  "Systems",
+  "Law",
+  "Accounts",
+  "Exploration",
+  "Hr",
   "Geology",
-  "Chemical Engineering",
-  "Mechanical Engineering",
-  "Electrical Engineering",
-  "IT & Digital",
-  "Finance",
-  "Human Resources",
-  "HSE",
+  "Mechanical",
 ];
 
 const STATUSES = ["active", "on_hold", "completed", "pending"];

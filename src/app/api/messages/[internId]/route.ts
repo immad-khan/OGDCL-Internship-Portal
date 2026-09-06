@@ -11,7 +11,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ int
   // Mark intern messages as read when the supervisor views the thread.
   await db
     .update(messages)
-    .set({ read: true })
+    .set({ isRead: true })
     .where(and(eq(messages.internId, Number(internId)), eq(messages.role, "intern")));
   return Response.json({ messages: messagesList });
 }

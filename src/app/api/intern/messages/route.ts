@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   // Mark supervisor messages as read when intern opens chat
   await db
     .update(messages)
-    .set({ read: true })
+    .set({ isRead: true })
     .where(and(eq(messages.internId, internId), eq(messages.role, "supervisor")));
 
   const rows = await db
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       senderName: intern?.name ?? "Intern",
       role: "intern",
       content,
-      read: false,
+      isRead: false,
     })
     .returning();
 
